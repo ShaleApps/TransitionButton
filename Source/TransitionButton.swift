@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 /**
-Stop animation style of the `TransitionButton`.
+ Stop animation style of the `TransitionButton`.
  
  - normal: just revert the button to the original state.
  - expand: expand the button and cover all the screen, useful to do transit animation.
@@ -26,7 +26,7 @@ public enum StopAnimationStyle {
 
 
 /// UIButton sublass for loading and transition animation. Useful for network based application or where you need to animate an action button while doing background tasks.
- 
+
 open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, CAAnimationDelegate {
     
     /// the color of the spinner while animating the button
@@ -107,7 +107,7 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
      - Parameter completion: a callback closure to be called once the animation finished, it may be useful to transit to another view controller, example transit to the home screen from the login screen.
      
      */
-    open func stopAnimation(animationStyle:StopAnimationStyle = .normal, revertAfterDelay delay: TimeInterval = 1.0, completion:(()->Void)? = nil) {
+    open func stopAnimation(animationStyle:StopAnimationStyle = .normal, revertAfterDelay delay: TimeInterval = 0.25, completion:(()->Void)? = nil) {
         
         switch animationStyle {
         case .normal:
@@ -155,7 +155,7 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
         self.window?.rootViewController?.view.isUserInteractionEnabled = true
         self.layer.cornerRadius = self.cornerRadius
     }
- 
+    
     private func animateToOriginalWidth() {
         let shrinkAnim = CABasicAnimation(keyPath: "bounds.size.width")
         shrinkAnim.fromValue = (self.bounds.height)
@@ -180,9 +180,13 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
     }
     
     private func expand(completion:(()->Void)?, revertDelay: TimeInterval) {
+        // Calculate the value to fully cover the entire screen during expanding
+        let maxLength = UIScreen.main.nativeBounds.size.maxLength
+        let factor = maxLength / frame.height + 5
+        
         let expandAnim = CABasicAnimation(keyPath: "transform.scale")
         expandAnim.fromValue            = 1.0
-        expandAnim.toValue              = 26.0
+        expandAnim.toValue              = factor
         expandAnim.timingFunction       = expandCurve
         expandAnim.duration             = 0.4
         expandAnim.fillMode             = kCAFillModeForwards
@@ -204,6 +208,11 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
     
 }
 
+private extension CGSize {
+    var maxLength: CGFloat {
+        return max(width, height)
+    }
+}
 
 public extension UIImage {
     public convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {

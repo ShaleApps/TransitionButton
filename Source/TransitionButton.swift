@@ -84,7 +84,7 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
      start animating the button, before starting a task, exemple: before a network call.
      */
     open func startAnimation() {
-        self.isUserInteractionEnabled = false // Disable the user interaction during the animation
+        self.window?.rootViewController?.view.isUserInteractionEnabled = false
         self.cachedTitle            = title(for: .normal)  // cache title before animation of spiner
         self.cachedImage            = image(for: .normal)  // cache image before animation of spiner
         
@@ -113,13 +113,13 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
         case .normal:
             completion?()
             // We return to original state after a delay to give opportunity to custom transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { timer in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 self.setOriginalState()
             }
         case .shake:
             completion?()
             // We return to original state after a delay to give opportunity to custom transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { timer in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 self.setOriginalState()
                 self.shakeAnimation()
             }
@@ -152,7 +152,7 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
         self.spiner.stopAnimation()
         self.setTitle(self.cachedTitle, for: .normal)
         self.setImage(self.cachedImage, for: .normal)
-        self.isUserInteractionEnabled = true // enable again the user interaction
+        self.window?.rootViewController?.view.isUserInteractionEnabled = true
         self.layer.cornerRadius = self.cornerRadius
     }
  
@@ -191,7 +191,7 @@ open class TransitionButton : UIButton, UIViewControllerTransitioningDelegate, C
         CATransaction.setCompletionBlock {
             completion?()
             // We return to original state after a delay to give opportunity to custom transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + revertDelay) { timer in
+            DispatchQueue.main.asyncAfter(deadline: .now() + revertDelay) {
                 self.setOriginalState()
                 self.layer.removeAllAnimations() // make sure we remove all animation
             }
